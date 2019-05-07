@@ -44,6 +44,7 @@ class MetkontrolServiceProvider extends ServiceProvider
                 dirname(__DIR__).'/migrations/create_metkontrol_tables.php' => $this->getMigrationFileName($filesystem),
             ], 'migrations');
 
+            
             $this->registerBladeExtensions();
             $this->registerInjection();
     }
