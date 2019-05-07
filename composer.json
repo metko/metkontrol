@@ -53,10 +53,7 @@
         "laravel": {
             "providers": [
                 "Metko\\Metkontrol\\MetkontrolServiceProvider"
-            ],
-            "aliases": {
-                "Metkontrol": "Metko\\Metkontrol\\MetkontrolFacade"
-            }
+            ]
         }
     }
 }

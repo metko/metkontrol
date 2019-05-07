@@ -30,19 +30,22 @@ class MetkontrolServiceProvider extends ServiceProvider
      */
     public function boot(Filesystem $filesystem)
     {
-
             //dump('------------boot method on register');
+            
             $this->publishes([
                 dirname(__DIR__).'/config/metkontrol.php' => config_path('metkontrol.php'),
             ], 'config');
 
             $this->publishes([
-                dirname(__DIR__).'/migrations/create_metkontrol_tables.php.stub' => $this->getMigrationFileName($filesystem),
+                dirname(__DIR__).'/seeds/MetkontrolTableSeeder.php' => $this->app->databasePath().'/seeds/MetkontrolTableSeeder.php',
+            ], 'seeds');
+
+            $this->publishes([
+                dirname(__DIR__).'/migrations/create_metkontrol_tables.php' => $this->getMigrationFileName($filesystem),
             ], 'migrations');
 
             $this->registerBladeExtensions();
             $this->registerInjection();
-        
     }
 
     public function registerInjection()
