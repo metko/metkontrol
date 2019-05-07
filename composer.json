@@ -1,0 +1,62 @@
+{
+    "name": "metko/metkontrol",
+    "description": "Pakage permission",
+    "keywords": [
+        "metko",
+        "metkontrol"
+    ],
+    "homepage": "https://github.com/metko/metkontrol",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Metko",
+            "email": "metko@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php" : ">=7.0",
+        "illuminate/auth": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0|~5.8.0",
+        "illuminate/container": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0|~5.8.0",
+        "illuminate/contracts": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0|~5.8.0",
+        "illuminate/database": "~5.4.0|~5.5.0|~5.6.0|~5.7.0|~5.8.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "~3.4.2|~3.5.0|~3.6.0|~3.7.0",
+        "phpunit/phpunit": "^5.7|6.2|^7.0",
+        "predis/predis": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Metko\\Metkontrol\\": "src"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Metko\\Metkontrol\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Metko\\Metkontrol\\MetkontrolServiceProvider"
+            ],
+            "aliases": {
+                "Metkontrol": "Metko\\Metkontrol\\MetkontrolFacade"
+            }
+        }
+    }
+}
