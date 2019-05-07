@@ -14,13 +14,12 @@ class CreateMetkontrolTables extends Migration
     public function up()
     {
          $tableNames = config('metkontrol.table_names');
-     
+         $fieldsNames = config('metkontrol.fields');
          //** CREATE ROLE TABLE */
          Schema::create($tableNames['roles'] ?? 'roles', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name')->unique();
             $table->string('slug');
-            $table->smallInteger('level');
             $table->text('description')->nullable();
             $table->timestamps();
          });
@@ -33,18 +32,28 @@ class CreateMetkontrolTables extends Migration
             $table->timestamps();
          });
 
-         Schema::create($tableNames['rollables'] ?? 'rollables', function (Blueprint $table) {
+         Schema::create($tableNames['rollables'] ?? 'rollables', function (Blueprint $table) use($tableNames, $fieldsNames){
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('role_id');
-            $table->morphs('rollable');
+            $table->unsignedBigInteger('role_id')->index();
+            $table->morphs($fieldsNames['rollable'] ?? "rollable");
             $table->timestamps();
+
+            $table->foreign('role_id')
+                ->references('id')
+                ->on($tableNames['roles'] ?? 'roles')
+                ->onDelete('cascade');
         });
 
-         Schema::create($tableNames['permissionables'] ?? 'permissionables', function (Blueprint $table) {
+         Schema::create($tableNames['permissionables'] ?? 'permissionables', function (Blueprint $table) use($tableNames, $fieldsNames) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('permission_id');
-            $table->morphs('permissionable');
+            $table->unsignedBigInteger('permission_id')->index();
+            $table->morphs($fieldsNames['permissionable'] ?? "permissionable");
             $table->timestamps();
+
+            $table->foreign('permission_id')
+                ->references('id')
+                ->on($tableNames['permissions'] ?? 'permissions')
+                ->onDelete('cascade');
         });
 
         
@@ -61,7 +70,7 @@ class CreateMetkontrolTables extends Migration
 
         Schema::dropIfExists($tableNames['roles'] ?? 'roles' );
         Schema::dropIfExists($tableNames['permisssions'] ?? 'permissions');
-        Schema::dropIfExists($tableNames['role_user'] ?? 'role_user');
-        Schema::dropIfExists($tableNames['permisssion_role'] ?? 'permission_role');
+        Schema::dropIfExists($tableNames['permissionables'] ?? 'permissionables');
+        Schema::dropIfExists($tableNames['rollables'] ?? 'rollables');
     }
 }

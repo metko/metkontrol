@@ -23,15 +23,18 @@ abstract class TestCase extends Orchestra
     }
 
     public function setUp()
-    {
-        parent::setup();
+    {        
         dump('------------setup test case');
-        $this->setUpDatabase($this->app);
-        $this->testUser = User::first();
-        $this->testCar = Car::find(2);
+
+        parent::setup();
+
         $this->permissionClass = app('Metkontrol\Permission');
         $this->roleClass = app('Metkontrol\Role');
         $this->userClass = app('Metkontrol\User');
+
+        $this->setUpDatabase($this->app);
+        $this->testUser = User::first();
+        $this->testCar = Car::find(2);
 
         $this->testUserRole = $this->roleClass->find(1);
         $this->testUserRole2 = $this->roleClass->find(2);
@@ -80,15 +83,14 @@ abstract class TestCase extends Orchestra
 
         User::create(['name' => 'test user','email' => 'test@user.com', 'password' => 'test']);
         Car::create(['name' => 'test car','email' => 'car@car.com', 'password' => 'car']);
-
-        app("Metkontrol\Role")->create(['name' => 'testRole', 'level' => 1]);
-        app("Metkontrol\Role")->create(['name' => 'testRole2', 'level' => 2]);
-
-       
-        app("Metkontrol\Permission")->create(['name' => 'Edit articles']);
-        app("Metkontrol\Permission")->create(['name' => 'Edit news']);
-        app("Metkontrol\Permission")->create(['name' => 'Edit blog']);
-        app("Metkontrol\Permission")->create(['name' => 'Edit comments']);
+        
+        $this->roleClass->create(['name' => 'testRole']);
+        $this->roleClass->create(['name' => 'testRole2']);
+        
+        $this->permissionClass->create(['name' => 'Edit articles']);
+        $this->permissionClass->create(['name' => 'Edit news']);
+        $this->permissionClass->create(['name' => 'Edit blog']);
+        $this->permissionClass->create(['name' => 'Edit comments']);
     }
 
 }

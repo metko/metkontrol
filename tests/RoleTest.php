@@ -1,8 +1,6 @@
 <?php
 
-use Metko\Metkontrol\Tests\Car;
 use Metko\Metkontrol\Tests\User;
-use Metko\Metkontrol\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Metko\Metkontrol\Tests\TestCase;
 
@@ -65,21 +63,25 @@ class RoleTest extends TestCase
    {
       $this->testUser->assignRole($this->testUserRole);
       $this->assertTrue($this->testUser->hasAnyRole(['testRole', $this->testUserRole2]));
-      $this->assertTrue($this->testUser->hasAnyRole('testRole|testRole2'));
+      $this->assertTrue($this->testUser->hasAnyRole('test-role|testRole2'));
    }
 
    /** @test */
    public function it_can_determine_that_a_user_has_all_of_the_given_roles()
    {
-      $roleModel = app(Role::class);
-      $this->assertFalse($this->testUser->hasAllRoles($roleModel->first()));
+      
+      $this->assertFalse($this->testUser->hasAllRoles($this->roleClass->first()));
       $this->assertFalse($this->testUser->hasAllRoles('testRole'));
-      $this->assertFalse($this->testUser->hasAllRoles($roleModel->all()));
-      $roleModel->create(['name' => 'second role', 'level' => 3]);
+      $this->assertFalse($this->testUser->hasAllRoles($this->roleClass->all()));
+
+      $this->roleClass->create(['name' => 'Second role']);
+      // dd(DB::table('_mk_roles')->get());
       $this->testUser->assignRole($this->testUserRole);
-      $this->assertFalse($this->testUser->hasAllRoles(['testRole', 'second role']));
+
+      $this->assertFalse($this->testUser->hasAllRoles(['test-role', 'second-role']));
+
       $this->testUser->assignRole('second role');
-      $this->assertTrue($this->testUser->hasAllRoles(['testRole', 'second role']));
+      $this->assertTrue($this->testUser->hasAllRoles('1|second role'));
    }
 
    /** @test */
@@ -105,6 +107,5 @@ class RoleTest extends TestCase
       $this->testUser->removeRole();
       $this->assertCount(0, $this->testUser->roles);
    }
-
    
 }

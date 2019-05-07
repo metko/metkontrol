@@ -29,7 +29,7 @@ trait MetkontrolPermission
       {
             return $this->morphToMany(
                   $this->getPermissionInstance(), 
-                  'permissionable');
+                  config("metkontrol.fields.permissionable"));
       }
 
       /**
@@ -58,13 +58,16 @@ trait MetkontrolPermission
        */
       public function hasPermissionTo($permission): bool
       {
+          
             if (is_string($permission)) {
                   $permission = $this->getPermissionInstance()->findByName($permission);
             }
 
-            if (is_int($permission)) {
+            if (is_int($permission)) {                  
                   $permission = $this->getPermissionInstance()->findById($permission);
             }
+            
+
             if (! $permission instanceof Permission) {
                   if(! is_null($permission)){
                         throw PermissionDoesNotExist::withType(get_class($permission));
@@ -102,7 +105,6 @@ trait MetkontrolPermission
       protected function hasPermissionViaRole(Permission $permission): bool
       {
             if( empty($permission->roles->first())) return false;
-
             return $this->hasRole($permission->roles);
       }
 
@@ -116,14 +118,7 @@ trait MetkontrolPermission
        */
       public function hasAllPermissions($permissions): bool
       {
-            if (is_string($permissions)) {
-                  if (false !== strpos($permissions, '|')) {
-                        $permissions = convertPipeToArray($permissions);
-                  }else{
-                        $permissions = [$permissions];
-                  } 
-            }
-
+            $permissions = $this->convertStringToArray($permissions);
             foreach ($permissions as $permission) {
                   if ( ! $this->checkPermissionTo($permission)) return false;
             }
@@ -139,7 +134,6 @@ trait MetkontrolPermission
        */
       public function hasDirectPermission($permission): bool
       {
-
             if (is_string($permission)) {
                   $permission = $this->getPermissionInstance()->findByName($permission);
                   if (! $permission) return false;
@@ -166,9 +160,8 @@ trait MetkontrolPermission
        */
       protected function mapPermissions($permissions): array
       {     
-            if(is_string($permissions)){
-                  $permissions = convertPipeToArray($permissions);
-            }
+            $permissions = checkPipeToArray($permissions);
+
             if(! is_array($permissions)) $permissions = [$permissions];
             return collect($permissions)
                   ->map(function ($permissions, $key) {
@@ -234,6 +227,22 @@ trait MetkontrolPermission
        */
       public function hasAnyPermission($permissions): bool
       {
+            $permissions = $this->convertStringToArray($permissions);
+            foreach ($permissions as $permission) {
+                  if ($this->checkPermissionTo($permission)) return true;
+            }
+            return false;
+      }
+
+      /**
+       * convertStringToArray
+       *
+       * @param  mixed $permissions
+       *
+       * @return void
+       */
+      public function convertStringToArray($permissions)
+      {
             if (is_string($permissions)) {
                   if (false !== strpos($permissions, '|')) {
                         $permissions = convertPipeToArray($permissions);
@@ -241,10 +250,7 @@ trait MetkontrolPermission
                         $permissions = [$permissions];
                   } 
             }
-            foreach ($permissions as $permission) {
-                  if ($this->checkPermissionTo($permission)) return true;
-            }
-            return false;
+            return $permissions;
       }
 
       
@@ -256,16 +262,12 @@ trait MetkontrolPermission
        */
       protected function convertToPermissionModels($permissions): array
       {
+            $permissions = checkPipeToArray($permissions);
             if ($permissions instanceof Collection) {
                   $permissions = $permissions->all();
             }
-            if (is_string($permissions) && false !== strpos($permissions, '|')) {
-                  $permissions = convertPipeToArray($permissions);
-            }
-
             $permissions = is_array($permissions) ? $permissions : [$permissions];
             return array_map(function ($permission) {
-
                   if ($permission instanceof Permission) return $permission;
                   return $this->getPermissionInstance()->findByName($permission);
 

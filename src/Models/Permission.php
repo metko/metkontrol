@@ -11,13 +11,22 @@ class Permission extends Model{
 
    protected $fillable = ['name', 'slug'];
 
+   
+    public function  __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->table = config('metkontrol.table_names.permissions');
+    }
+
    public function roles()
    {
-      return $this->morphedByMany(app('Metkontrol\Role'), 'permissionable');
+      return $this->morphedByMany(app('Metkontrol\Role'),
+            config("metkontrol.fields.permissionable"));
    }
    public function users()
    {
-      return $this->morphedByMany(app('Metkontrol\User'), 'permissionable');
+      return $this->morphedByMany(app('Metkontrol\User'),
+            config("metkontrol.fields.permissionable"));
    }
 
 

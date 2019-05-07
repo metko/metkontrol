@@ -1,4 +1,21 @@
 <?php
+/**
+    * convertPipeToArrayPermisssion
+    *
+    * @param  mixed $pipeString
+    *
+    * @return void
+    */
+   if( ! function_exists("checkPipeToArray")){
+      function checkPipeToArray($string)
+      {
+            if (is_string($string) && false !== strpos($string, '|')) {
+                  return convertPipeToArray($string);
+            }
+            return $string;
+      }
+   }
+
    /**
     * convertPipeToArrayPermisssion
     *

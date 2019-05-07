@@ -13,8 +13,17 @@ class PermissionTest extends TestCase
     public function setup()
     {
         parent::setup();
-
     }
+
+    protected function createUser($name)
+    {
+        return $this->userClass->create([
+            'name' => $name, 'email' => "{$name}@test.com",
+            'password' => "pass"
+            ]);
+    }
+
+
    /** @test */
    public function it_has_user_models_of_the_right_class()
    {
@@ -51,8 +60,8 @@ class PermissionTest extends TestCase
    /** @test */
    public function it_can_scope_users_using_a_string()
    {
-       $user1 = $this->userClass->create(['name' => "Jean1", 'email' => 'user1@test.com', 'password' => "pass"]);
-       $user2 = $this->userClass->create(['name' => "Jean2", 'email' => 'user2@test.com', 'password' => "pass"]);
+       $user1 = $this->createUser("jean");
+       $user2 = $this->createUser("edouard");
 
        $user1->givePermissionTo(['edit-articles', 'edit-news']);
        $this->testUserRole->givePermissionTo('edit-articles');
@@ -69,8 +78,8 @@ class PermissionTest extends TestCase
    /** @test */
    public function it_can_scope_users_using_an_array()
    {
-        $user1 = $this->userClass->create(['name' => "Jean1", 'email' => 'user1@test.com', 'password' => "pass"]);
-        $user2 = $this->userClass->create(['name' => "Jean2", 'email' => 'user2@test.com', 'password' => "pass"]);
+        $user1 = $this->createUser("jean");
+        $user2 = $this->createUser("edouard");
 
        $user1->givePermissionTo(['edit-articles', 'edit-news']);
        $this->testUserRole->givePermissionTo('edit-articles|edit-blog');
@@ -78,6 +87,7 @@ class PermissionTest extends TestCase
 
        $scopedUsers1 = $this->userClass->permission(['edit-articles', 'edit-news'])->get();
        $scopedUsers2 = $this->userClass->permission('edit-news|edit-blog')->get();
+
        $this->assertEquals($scopedUsers1->count(), 2);
        $this->assertEquals($scopedUsers2->count(), 2);
    }
@@ -85,25 +95,24 @@ class PermissionTest extends TestCase
    /** @test */
    public function it_can_scope_users_using_a_collection()
    {
-        $user1 = $this->userClass->create(['name' => "Jean1", 'email' => 'user1@test.com', 'password' => "pass"]);
-        $user2 = $this->userClass->create(['name' => "Jean2", 'email' => 'user2@test.com', 'password' => "pass"]);
+        $user1 = $this->createUser("jean");
+        $user2 = $this->createUser("edouard");
 
-       $user1->givePermissionTo(['edit-articles', 'edit-news']);
-       $this->testUserRole->givePermissionTo('edit-articles');
-       $user2->assignRole('testRole');
+        $user1->givePermissionTo(['edit-articles', 'edit-news']);
+        $this->testUserRole->givePermissionTo('edit-articles');
+        $user2->assignRole('testRole');
 
-       $scopedUsers1 = $this->userClass->permission(collect(['edit-articles', 'edit-news']))->get();
-       $scopedUsers2 = $this->userClass->permission(collect(['edit-news']))->get();
-       
-       $this->assertEquals($scopedUsers1->count(), 2);
-       $this->assertEquals($scopedUsers2->count(), 1);
+        $scopedUsers1 = $this->userClass->permission(collect(['edit-articles', 'edit-news']))->get();
+        $scopedUsers2 = $this->userClass->permission(collect(['edit-news']))->get();
+
+        $this->assertEquals($scopedUsers1->count(), 2);
+        $this->assertEquals($scopedUsers2->count(), 1);
    }
 
    /** @test */
    public function it_can_scope_users_using_an_object()
    {
-        $user1 = $this->userClass->create(['name' => "Jean1", 'email' => 'user1@test.com', 'password' => "pass"]);
-
+        $user1 = $this->createUser("jean");
         $user1->givePermissionTo($this->testUserPermission->name);
 
        $scopedUsers1 = $this->userClass->permission($this->testUserPermission)->get();
@@ -118,26 +127,27 @@ class PermissionTest extends TestCase
    /** @test */
    public function it_can_scope_users_without_permissions_only_role()
    {
-        $user1 = $this->userClass->create(['name' => "Jean1", 'email' => 'user1@test.com', 'password' => "pass"]);
-        $user2 = $this->userClass->create(['name' => "Jean2", 'email' => 'user2@test.com', 'password' => "pass"]);
+        $user1 = $this->createUser("jean");
+        $user2 = $this->createUser("edouard");
 
-       $this->testUserRole->givePermissionTo('edit-articles');
-       $user1->assignRole($this->testUserRole);
-       $user2->assignRole($this->testUserRole);
-       $scopedUsers = $this->userClass->permission('edit-articles')->get();
-       $this->assertEquals($scopedUsers->count(), 2);
+        $this->testUserRole->givePermissionTo('edit-articles');
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole($this->testUserRole);
+        $scopedUsers = $this->userClass->permission('edit-articles')->get();
+        $this->assertEquals($scopedUsers->count(), 2);
    }
 
    /** @test */
    public function it_can_scope_users_without_roles_only_permission()
    {
-        $user1 = $this->userClass->create(['name' => "Jean1", 'email' => 'user1@test.com', 'password' => "pass"]);
-        $user2 = $this->userClass->create(['name' => "Jean2", 'email' => 'user2@test.com', 'password' => "pass"]);
+        $user1 = $this->createUser("jean");
+        $user2 = $this->createUser("edouard");
 
-       $user1->givePermissionTo(['edit-news']);
-       $user2->givePermissionTo(['edit-articles', 'edit-news']);
-       $scopedUsers = $this->userClass->permission('edit-news')->get();
-       $this->assertEquals($scopedUsers->count(), 2);
+        $user1->givePermissionTo(['edit-news']);
+        $user2->givePermissionTo(['edit-articles', 'edit-news']);
+        
+        $scopedUsers = $this->userClass->permission('edit-news')->get();
+        $this->assertEquals($scopedUsers->count(), 2);
    }
 
    /** @test */
@@ -233,7 +243,7 @@ class PermissionTest extends TestCase
    /** @test */
    public function it_throws_an_exception_when_calling_hasPermissionTo_with_an_invalid_type()
    {
-        $user1 = $this->userClass->create(['name' => "Jean1", 'email' => 'user1@test.com', 'password' => "pass"]);
+        $user1 = $this->createUser("jean");
         $this->expectException(PermissionDoesNotExist::class);
         $user1->hasPermissionTo(new \stdClass());
    }
@@ -241,9 +251,9 @@ class PermissionTest extends TestCase
    /** @test */
    public function it_throws_an_exception_when_calling_hasPermissionTo_with_null()
    {
-        $user1 = $this->userClass->create(['name' => "Jean1", 'email' => 'user1@test.com', 'password' => "pass"]);
+        $user1 = $this->createUser("jean");
         $this->expectException(PermissionDoesNotExist::class);
-       $user1->hasPermissionTo(null);
+        $user1->hasPermissionTo(null);
    }
 
    /** @test */
@@ -325,14 +335,14 @@ class PermissionTest extends TestCase
    /** @test */
    public function it_throws_an_exception_when_calling_hasDirectPermission_with_an_invalid_type()
    {
-        $user1 = $this->userClass->create(['name' => "Jean1", 'email' => 'user1@test.com', 'password' => "pass"]);
+        $user1 = $this->createUser("jean");
         $this->assertFalse($user1->hasDirectPermission(new \stdClass()));
    }
 
    /** @test */
    public function it_throws_an_exception_when_calling_hasDirectPermission_with_null()
    {
-        $user1 = $this->userClass->create(['name' => "Jean1", 'email' => 'user1@test.com', 'password' => "pass"]);
+        $user1 = $this->createUser("jean");
         $this->assertFalse($user1->hasDirectPermission(null));
    }
 
@@ -352,5 +362,4 @@ class PermissionTest extends TestCase
        $this->assertEquals($this->testUserPermission->id, $permission_by_id->id);
    }
 
-    
 }

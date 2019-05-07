@@ -8,7 +8,6 @@ use Metko\Metkontrol\Models\Permission;
 
 trait Metkontrol
 {     
-
        /**
        * getPermissionInstance
        *
@@ -27,7 +26,7 @@ trait Metkontrol
       {
             return $this->morphToMany(
                    $this->getRoleInstance(),
-                   'rollable');
+                   config("metkontrol.fields.rollable"));
       }
 
      /**
@@ -71,21 +70,9 @@ trait Metkontrol
        */
       public function hasRole($role): bool
       {
-            //dd($role);
-          
-            if(is_string($role)){
-                  return $this->roles->contains('name', $role) ||
-                        $this->roles->contains('slug', $role);
+            if(is_numeric($role) || is_string($role) || $role instanceof Collection){
+                  return $this->isContainInRoles($role);
             }
-            if(is_int($role)){
-                  
-                  return $this->roles->contains('id', $role);
-            }
-
-            if($role instanceof Collection){
-                  $role = $role[0];
-            }
-
             return $this->roles->contains($role);
       }
 
@@ -98,15 +85,35 @@ trait Metkontrol
        */
       public function hasAnyRole($roles)
       {
-
-            if (is_string($roles) && false !== strpos($roles, '|')) {
-                  $roles = convertPipeToArray($roles);
-            }
-
+            $roles = checkPipeToArray($roles);
             if(is_array($roles)){
                   foreach($roles as $r) if ($this->hasRole($r))  return true;          
             }
             return false;   
+      }
+
+      /**
+       * isContainInRoles
+       *
+       * @param  mixed $roles
+       *
+       * @return void
+       */
+      public function isContainInRoles($roles)
+      {
+            if (is_numeric($roles)) {
+                  return $this->roles->contains('id', $roles);
+            }
+            if (is_string($roles)) {
+                  return $this->roles->contains('name', $roles) || 
+                  $this->roles->contains('slug', $roles);
+            }
+            if($roles instanceof Collection){
+                  $roles = $roles[0];
+            }
+            if ($roles instanceof Role) {
+                  return $this->roles->contains('id', $roles->id);
+            }
       }
 
       /**
@@ -118,23 +125,25 @@ trait Metkontrol
        */
       public function hasAllRoles($roles): bool
       {
-            if (is_string($roles) && false !== strpos($roles, '|')) {
-                  $roles = convertPipeToArray($roles);
-            }
-            if (is_string($roles)) {
-                  return $this->roles->contains('name', $roles);
-            }
-            if ($roles instanceof Role) {
-                  return $this->roles->contains('id', $roles->id);
+            $roles = checkPipeToArray($roles);
+            if(is_numeric($roles) || is_string($roles) || $roles instanceof Role){
+                  return $this->isContainInRoles($roles);
             }
             $roles = collect()->make($roles)->map(function ($role) {
+                  if($role instanceof Role){
+                        return $role->name;
+                  }else{
+                        if (is_numeric($role)) {
+                              return $this->getRoleByID($role)->name;
+                        }
+                        if (is_string($role)) {
+                              return $this->getRoleByName($role)->name;
+                        }
+                  }
                   return $role instanceof Role ? $role->name : $role;
             });
-
             return $roles->intersect($this->getRoleNames()) == $roles;
       } 
-
-    
 
       /**
        * getRoleNames
@@ -145,6 +154,7 @@ trait Metkontrol
       {
             return $this->roles->pluck('name');
       }
+      
       /**
        * Map the $role params 
        *
@@ -154,18 +164,16 @@ trait Metkontrol
        */
       protected function mapRoles($role): array
       {
-            if (is_string($role) && false !== strpos($role, '|')) {
-                  $role = convertPipeToArray($role);
-            }
+            $role = checkPipeToArray($role);
             if(! is_array($role)) $role = [$role];
-            return collect($role)
-                  ->map(function ($role, $key) {
+
+            return collect($role)->make($role)->map(function ($role, $key) {
                         if( ! $role instanceof Role){
+                              if(is_numeric($role)){
+                                    return $this->getRoleByID($role);
+                              }
                               if(is_string($role)){
                                     return $this->getRoleByName($role);
-                              }
-                              if(is_int($role)){
-                                    return $this->getRoleByID($role);
                               }
                         }
                         return $role;

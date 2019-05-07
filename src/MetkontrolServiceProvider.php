@@ -55,8 +55,10 @@ class MetkontrolServiceProvider extends ServiceProvider
         $this->app->singleton("Metkontrol\Role", function ($app) use($config) {
             return new $config['role']();
         });
-
         $this->app->singleton("Metkontrol\User", function ($app) use($config) {
+            if(app()->environment() == "testing"){
+                return new \Metko\Metkontrol\Tests\User();
+            }
             return new $config['user']();
         });
     }

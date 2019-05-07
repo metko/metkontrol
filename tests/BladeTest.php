@@ -11,8 +11,8 @@ class BladeTest extends TestCase
    {
       parent::setup();
 
-      $this->roleClass->create(['name' => 'member', 'level' => 1]);
-      $this->roleClass->create(['name' => 'writer', 'level' => 2]);
+      $this->roleClass->create(['name' => 'member']);
+      $this->roleClass->create(['name' => 'writer']);
    }
 
    /** @test */
