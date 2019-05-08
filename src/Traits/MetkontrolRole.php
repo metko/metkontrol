@@ -2,11 +2,11 @@
 
 namespace Metko\Metkontrol\Traits;
 
+use Metko\Metkontrol\Metkontrol;
 use Metko\Metkontrol\Models\Role;
 use Illuminate\Support\Collection;
-use Metko\Metkontrol\MetkontrolCache;
 
-trait Metkontrol
+trait MetkontrolRole
 {
     /**
      * getPermissionInstance.
@@ -184,6 +184,6 @@ trait Metkontrol
      */
     public function getStoredRole($role, $column = null): Role
     {
-        return app(MetkontrolCache::class)->getStoredRole($role, $column);
+        return app(Metkontrol::class)->getStoredRole($role, $column);
     }
 }

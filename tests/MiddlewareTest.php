@@ -6,62 +6,60 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Metko\Metkontrol\Middlewares\RoleMiddleware;
+use Metko\Metkontrol\Exceptions\UnauthorizedException;
 use Metko\Metkontrol\Middlewares\PermissionMiddleware;
 use Metko\Metkontrol\Middlewares\RoleOrPermissionMiddleware;
 
-
 class MiddlewareTest extends TestCase
 {
+    protected $roleMiddleware;
+    protected $permissionMiddleware;
+    protected $roleOrPermissionMiddleware;
 
+    public function setUp()
+    {
+        parent::setUp();
+        $this->withoutExceptionHandling();
+        $this->roleMiddleware = new RoleMiddleware($this->app);
+        $this->permissionMiddleware = new PermissionMiddleware($this->app);
+        $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware($this->app);
+    }
 
-   protected $roleMiddleware;
-   protected $permissionMiddleware;
-   protected $roleOrPermissionMiddleware;
-
-   public function setUp()
-   {
-      parent::setUp();
-      $this->withoutExceptionHandling();
-      $this->roleMiddleware = new RoleMiddleware($this->app);
-      $this->permissionMiddleware = new PermissionMiddleware($this->app);
-      $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware($this->app);
-   }
-
-   /** @test */
-   public function a_guest_cannot_access_a_route_protected_by_role_middleware()
-   {  
-       $this->withExceptionHandling();
-       //dd('ddd');
-       $this->runMiddleware($this->roleMiddleware, 'testRole');
-       $this->assertEquals(
+    /** @test */
+    public function a_guest_cannot_access_a_route_protected_by_role_middleware()
+    {
+        //$this->expectException(UnauthorizedException::class);
+        //dd('ddd');
+        $this->runMiddleware($this->roleMiddleware, 'testRole');
+        $this->assertEquals(
            $this->runMiddleware(
                $this->roleMiddleware, 'testRole'
-           ), 403);        
-   }
+           ), 403);
+    }
 
-   /** @test */
-   public function a_user_cant_access_a_route_protected_by_role_middleware_if_he_dont_have_one_of_the_roles()
-   {  
-       Auth::login($this->testUser);
-       $this->testUser->assignRole('testRole');
-       $this->assertEquals(
+    /** @test */
+    public function a_user_cant_access_a_route_protected_by_role_middleware_if_he_dont_have_one_of_the_roles()
+    {
+        Auth::login($this->testUser);
+        $this->testUser->assignRole('testRole');
+        $this->assertEquals(
            $this->runMiddleware(
                $this->roleMiddleware, 'testRole1|testRole2'
-           ), 403);        
-   }
+           ), 403);
+    }
 
-   /** @test */
-   public function a_user_can_access_a_route_protected_by_role_middleware_if_have_this_role()
-   {
-       Auth::login($this->testUser);
-       $this->testUser->assignRole('testRole2');
-       $this->assertEquals(
+    /** @test */
+    public function a_user_can_access_a_route_protected_by_role_middleware_if_have_this_role()
+    {
+        Auth::login($this->testUser);
+        $this->testUser->assignRole('testRole2');
+        $this->assertEquals(
            $this->runMiddleware(
                $this->roleMiddleware, 'testRole|testRole2'
            ), 200);
-   }
+    }
 
-   protected function runMiddleware($middleware, $parameter)
+    protected function runMiddleware($middleware, $parameter)
     {
         try {
             return $middleware->handle(new Request(), function () {
@@ -174,10 +172,5 @@ class MiddlewareTest extends TestCase
             $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'),
             403
         );
-        $this->assertEquals(
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission'),
-            403
-        );
     }
-
 }

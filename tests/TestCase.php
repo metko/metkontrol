@@ -40,7 +40,6 @@ abstract class TestCase extends Orchestra
     protected function getEnvironmentSetUp($app)
     {
         //dump('------------getenvironment setup');
-        dump('getEnvSeztup');
         $app['config']->set('metkontrol', require(dirname(__DIR__).'/config/metkontrol.php'));
         $app['config']->set('view.paths', [dirname(__DIR__).'/tests/views']);
 
@@ -62,8 +61,6 @@ abstract class TestCase extends Orchestra
      */
     protected function setUpDatabase($app)
     {
-        dump('------------setupdatabasse');
-
         $this->loadLaravelMigrations();
         $this->loadMigrationsFrom(dirname(__DIR__).'/migrations');
 

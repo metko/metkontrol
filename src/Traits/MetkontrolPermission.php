@@ -2,8 +2,8 @@
 
 namespace Metko\Metkontrol\Traits;
 
+use Metko\Metkontrol\Metkontrol;
 use Illuminate\Support\Collection;
-use Metko\Metkontrol\MetkontrolCache;
 use Metko\Metkontrol\Models\Permission;
 use Illuminate\Database\Eloquent\Builder;
 use Metko\Metkontrol\Exceptions\PermissionDoesNotExist;
@@ -291,6 +291,6 @@ trait MetkontrolPermission
      */
     protected function getStoredPermissions($permissions, $pluck = null)
     {
-        return app(MetkontrolCache::class)->getStoredPermission($permissions, $pluck);
+        return app(Metkontrol::class)->getStoredPermission($permissions, $pluck);
     }
 }

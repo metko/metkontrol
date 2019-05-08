@@ -14,7 +14,6 @@ class MetkontrolServiceProvider extends ServiceProvider
      */
     public function boot(MetkontrolCache $metkontrolCache, Filesystem $filesystem)
     {
-        //dump('------------boot method on register');
         $this->publishes([
                 dirname(__DIR__).'/config/metkontrol.php' => config_path('metkontrol.php'),
             ], 'config');
@@ -31,6 +30,10 @@ class MetkontrolServiceProvider extends ServiceProvider
         $this->app->singleton(MetkontrolCache::class, function ($app) use ($metkontrolCache) {
             return $metkontrolCache;
         });
+
+        $this->app->singleton(Metkontrol::class, function ($app) {
+            return new Metkontrol();
+        });
     }
 
     /**
@@ -38,7 +41,6 @@ class MetkontrolServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //dump('------------register method on register');
         $this->registerBladeExtensions();
     }
 
@@ -153,7 +155,6 @@ class MetkontrolServiceProvider extends ServiceProvider
      */
     protected function getMigrationFileName(Filesystem $filesystem): string
     {
-        //dump('------------getMigrationFileName method on register');
         $timestamp = date('Y_m_d_His');
 
         return Collection::make($this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR)
