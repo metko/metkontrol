@@ -1,4 +1,5 @@
 <?php
+
 namespace Metko\Metkontrol\Exceptions;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -17,6 +18,7 @@ class UnauthorizedException extends HttpException
         }
         $exception = new static(403, $message, null, []);
         $exception->requiredRoles = $roles;
+
         return $exception;
     }
 
@@ -29,6 +31,7 @@ class UnauthorizedException extends HttpException
         }
         $exception = new static(403, $message, null, []);
         $exception->requiredPermissions = $permissions;
+
         return $exception;
     }
 
@@ -41,11 +44,12 @@ class UnauthorizedException extends HttpException
         }
         $exception = new static(403, $message, null, []);
         $exception->requiredPermissions = $rolesOrPermissions;
+
         return $exception;
     }
 
     public static function notLoggedIn(): self
-    {  
+    {
         return new static(403, 'User is not logged in.', null, []);
     }
 
@@ -58,5 +62,4 @@ class UnauthorizedException extends HttpException
     {
         return $this->requiredPermissions;
     }
-    
 }

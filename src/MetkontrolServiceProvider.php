@@ -9,61 +9,54 @@ use Illuminate\View\Compilers\BladeCompiler;
 
 class MetkontrolServiceProvider extends ServiceProvider
 {
+    /**
+     * Bootstrap services.
+     */
+    public function boot(MetkontrolCache $metkontrolCache, Filesystem $filesystem)
+    {
+        //dump('------------boot method on register');
+        $this->publishes([
+                dirname(__DIR__).'/config/metkontrol.php' => config_path('metkontrol.php'),
+            ], 'config');
+
+        $this->publishes([
+                dirname(__DIR__).'/seeds/MetkontrolTableSeeder.php' => $this->app->databasePath().'/seeds/MetkontrolTableSeeder.php',
+            ], 'seeds');
+
+        $this->publishes([
+                dirname(__DIR__).'/migrations/create_metkontrol_tables.php' => $this->getMigrationFileName($filesystem),
+            ], 'migrations');
+
+        $this->registerInjection();
+        $this->app->singleton(MetkontrolCache::class, function ($app) use ($metkontrolCache) {
+            return $metkontrolCache;
+        });
+    }
 
     /**
      * Register services.
-     *
-     * @return void
      */
     public function register()
     {
         //dump('------------register method on register');
-
-    }
-
-    
-
-    /**
-     * Bootstrap services.
-     *
-     * @return void
-     */
-    public function boot(Filesystem $filesystem)
-    {
-            //dump('------------boot method on register');
-            
-            $this->publishes([
-                dirname(__DIR__).'/config/metkontrol.php' => config_path('metkontrol.php'),
-            ], 'config');
-
-            $this->publishes([
-                dirname(__DIR__).'/seeds/MetkontrolTableSeeder.php' => $this->app->databasePath().'/seeds/MetkontrolTableSeeder.php',
-            ], 'seeds');
-
-            $this->publishes([
-                dirname(__DIR__).'/migrations/create_metkontrol_tables.php' => $this->getMigrationFileName($filesystem),
-            ], 'migrations');
-
-
-            
-            $this->registerBladeExtensions();
-            $this->registerInjection();
+        $this->registerBladeExtensions();
     }
 
     public function registerInjection()
     {
         $config = config('metkontrol.models');
-        $this->app->singleton("Metkontrol\Permission", function ($app) use($config) {
+        $this->app->singleton("Metkontrol\Permission", function ($app) use ($config) {
             return new $config['permission']();
         });
 
-        $this->app->singleton("Metkontrol\Role", function ($app) use($config) {
+        $this->app->singleton("Metkontrol\Role", function ($app) use ($config) {
             return new $config['role']();
         });
-        $this->app->singleton("Metkontrol\User", function ($app) use($config) {
-            if(app()->environment() == "testing"){
+        $this->app->singleton("Metkontrol\User", function ($app) use ($config) {
+            if (app()->environment() == 'testing') {
                 return new \Metko\Metkontrol\Tests\User();
             }
+
             return new $config['user']();
         });
     }
@@ -71,7 +64,6 @@ class MetkontrolServiceProvider extends ServiceProvider
     public function registerBladeExtensions()
     {
         $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
-            
             //HAS ROLE
             $bladeCompiler->directive('role', function ($role) {
                 return "<?php if(auth()->check() && auth()->user()->hasRole({$role})): ?>";
@@ -111,7 +103,6 @@ class MetkontrolServiceProvider extends ServiceProvider
             });
             // END HAS ALL ROLE
 
-
             //HAS PERMISSIONS
             $bladeCompiler->directive('permission', function ($permission) {
                 return "<?php if(auth()->check() && auth()->user()->checkPermissionTo({$permission})): ?>";
@@ -140,7 +131,7 @@ class MetkontrolServiceProvider extends ServiceProvider
             $bladeCompiler->directive('endhasallpermissions', function () {
                 return '<?php endif; ?>';
             });
-             // ENDHAS ALL PERMISSIONS
+            // ENDHAS ALL PERMISSIONS
 
             // HAUNLESS PERMISSIONS
             $bladeCompiler->directive('unlesspermission', function ($permissions) {
@@ -149,7 +140,7 @@ class MetkontrolServiceProvider extends ServiceProvider
             $bladeCompiler->directive('endunlesspermission', function () {
                 return '<?php endif; ?>';
             });
-             // END UNLESS PERMISSIONS
+            // END UNLESS PERMISSIONS
         });
     }
 
@@ -157,19 +148,18 @@ class MetkontrolServiceProvider extends ServiceProvider
      * Returns existing migration file if found, else uses the current timestamp.
      *
      * @param Filesystem $filesystem
+     *
      * @return string
      */
     protected function getMigrationFileName(Filesystem $filesystem): string
     {
         //dump('------------getMigrationFileName method on register');
         $timestamp = date('Y_m_d_His');
+
         return Collection::make($this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR)
             ->flatMap(function ($path) use ($filesystem) {
                 return $filesystem->glob($path.'*_create_metkontrol_tables.php');
             })->push($this->app->databasePath()."/migrations/{$timestamp}_create_metkontrol_tables.php")
             ->first();
     }
-
-
-    
 }

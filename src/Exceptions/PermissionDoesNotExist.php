@@ -1,4 +1,5 @@
 <?php
+
 namespace Metko\Metkontrol\Exceptions;
 
 use InvalidArgumentException;
@@ -19,6 +20,4 @@ class PermissionDoesNotExist extends InvalidArgumentException
     {
         return new static("{$type} is not a valid permission class");
     }
-    
-    
 }

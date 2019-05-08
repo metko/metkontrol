@@ -1,4 +1,5 @@
 <?php
+
 namespace Metko\Metkontrol\Middlewares;
 
 use Closure;
@@ -15,9 +16,10 @@ class RoleOrPermissionMiddleware
         $rolesOrPermissions = is_array($roleOrPermission)
             ? $roleOrPermission
             : explode('|', $roleOrPermission);
-        if (! Auth::user()->hasAnyRole($rolesOrPermissions) && ! Auth::user()->hasAnyPermission($rolesOrPermissions)) {
+        if (!Auth::user()->hasAnyRole($rolesOrPermissions) && !Auth::user()->hasAnyPermission($rolesOrPermissions)) {
             throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);
         }
+
         return $next($request);
     }
 }

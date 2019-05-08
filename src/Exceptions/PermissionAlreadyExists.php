@@ -1,4 +1,5 @@
 <?php
+
 namespace Metko\Metkontrol\Exceptions;
 
 use InvalidArgumentException;
