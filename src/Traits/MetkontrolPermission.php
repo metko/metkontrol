@@ -138,7 +138,7 @@ trait MetkontrolPermission
     /**
      * Determine if the model has the given permission.
      *
-     * @param string|int|\Metko\Metkontrol\Contracts\Permission $permission
+     * @param string|int|\Metko\Metkontrol\Permission $permission
      *
      * @return bool
      */
