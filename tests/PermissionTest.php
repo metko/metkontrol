@@ -45,11 +45,11 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
-    public function it_can_revoke_a_permission_from_a_model()
+    public function it_can_remove_a_permission_from_a_model()
     {
         $this->testUser->givePermissionTo($this->testUserPermission);
         $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
-        $this->testUser->revokePermissionTo($this->testUserPermission);
+        $this->testUser->removePermissionTo($this->testUserPermission);
         $this->assertFalse($this->testUser->hasPermissionTo($this->testUserPermission));
     }
 
@@ -62,7 +62,7 @@ class PermissionTest extends TestCase
         $user1->givePermissionTo(['edit-articles', 'edit-news']);
         $this->testUserRole->givePermissionTo('edit-articles');
 
-        $user2->assignRole('testRole');
+        $user2->attachRole('testRole');
         //dd(DB::table('permissionables')->get());
         $scopedUsers1 = $this->userClass->permission('edit-articles')->get();
         $scopedUsers2 = $this->userClass->permission(['edit-news'])->get();
@@ -79,7 +79,7 @@ class PermissionTest extends TestCase
 
         $user1->givePermissionTo(['edit-articles', 'edit-news']);
         $this->testUserRole->givePermissionTo('edit-articles|edit-blog');
-        $user2->assignRole('testRole');
+        $user2->attachRole('testRole');
 
         $scopedUsers1 = $this->userClass->permission(['edit-articles', 'edit-news'])->get();
         $scopedUsers2 = $this->userClass->permission('edit-news|edit-blog')->get();
@@ -96,7 +96,7 @@ class PermissionTest extends TestCase
 
         $user1->givePermissionTo(['edit-articles', 'edit-news']);
         $this->testUserRole->givePermissionTo('edit-articles');
-        $user2->assignRole('testRole');
+        $user2->attachRole('testRole');
         $scopedUsers1 = $this->userClass->permission(collect(['edit-articles', 'edit-news']))->get();
         $scopedUsers2 = $this->userClass->permission(collect(['edit-news']))->get();
 
@@ -126,8 +126,8 @@ class PermissionTest extends TestCase
         $user2 = $this->createUser('edouard');
 
         $this->testUserRole->givePermissionTo('edit-articles');
-        $user1->assignRole($this->testUserRole);
-        $user2->assignRole($this->testUserRole);
+        $user1->attachRole($this->testUserRole);
+        $user2->attachRole($this->testUserRole);
         $scopedUsers = $this->userClass->permission('edit-articles')->get();
         $this->assertEquals($scopedUsers->count(), 2);
     }
@@ -146,24 +146,24 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
-    public function it_can_give_and_revoke_multiple_permissions()
+    public function it_can_give_and_remove_multiple_permissions()
     {
         $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
         $this->assertEquals(2, $this->testUserRole->permissions()->count());
-        $this->testUserRole->revokePermissionTo('edit-articles|edit-news');
+        $this->testUserRole->removePermissionTo('edit-articles|edit-news');
         $this->assertEquals(0, $this->testUserRole->permissions()->count());
         $this->testUserRole->givePermissionTo('edit-articles|edit-news');
         $this->assertEquals(2, $this->testUserRole->permissions()->count());
-        $this->testUserRole->revokePermissionTo([$this->testUserPermission, 'edit-news']);
+        $this->testUserRole->removePermissionTo([$this->testUserPermission, 'edit-news']);
         $this->assertEquals(0, $this->testUserRole->permissions()->count());
     }
 
     /** @test */
-    public function it_can_revoke_all_permissions()
+    public function it_can_remove_all_permissions()
     {
         $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
         $this->assertEquals(2, $this->testUserRole->permissions()->count());
-        $this->testUserRole->revokePermissionTo();
+        $this->testUserRole->removePermissionTo();
         $this->assertEquals(0, $this->testUserRole->permissions()->count());
     }
 
@@ -193,7 +193,7 @@ class PermissionTest extends TestCase
         $this->testUser->givePermissionTo('edit-articles');
         $this->assertTrue($this->testUser->hasAnyPermission(['edit-news', 'edit-articles']));
         $this->testUser->givePermissionTo('edit-news');
-        $this->testUser->revokePermissionTo($this->testUserPermission);
+        $this->testUser->removePermissionTo($this->testUserPermission);
         $this->assertTrue($this->testUser->hasAnyPermission('edit-articles|edit-news'));
     }
 
@@ -204,7 +204,7 @@ class PermissionTest extends TestCase
         $this->testUser->givePermissionTo('edit-articles');
         $this->assertTrue($this->testUser->hasAnyPermission(['edit-news', 'edit-articles']));
         $this->testUser->givePermissionTo('edit-news');
-        $this->testUser->revokePermissionTo($this->testUserPermission);
+        $this->testUser->removePermissionTo($this->testUserPermission);
         $this->assertTrue($this->testUser->hasAnyPermission(['edit-articles', 'edit-news']));
     }
 
@@ -212,7 +212,7 @@ class PermissionTest extends TestCase
     public function it_can_determine_that_the_user_has_any_of_the_permissions_via_role()
     {
         $this->testUserRole->givePermissionTo('edit-articles');
-        $this->testUser->assignRole('testRole');
+        $this->testUser->attachRole('testRole');
         $this->assertTrue($this->testUser->hasAnyPermission(['edit-news', 'edit-articles']));
     }
 
@@ -221,7 +221,7 @@ class PermissionTest extends TestCase
     {
         $this->testUser->givePermissionTo('edit-articles|edit-news');
         $this->assertTrue($this->testUser->hasAllPermissions('edit-articles|edit-news'));
-        $this->testUser->revokePermissionTo('edit-articles');
+        $this->testUser->removePermissionTo('edit-articles');
         $this->assertFalse($this->testUser->hasAllPermissions('edit-articles', 'edit-news'));
     }
 
@@ -229,10 +229,10 @@ class PermissionTest extends TestCase
     public function it_can_determine_that_the_user_has_all_of_the_permissions_directly_using_an_array()
     {
         $this->assertFalse($this->testUser->hasAllPermissions(['edit-articles', 'edit-news']));
-        $this->testUser->revokePermissionTo('edit-articles');
+        $this->testUser->removePermissionTo('edit-articles');
         $this->assertFalse($this->testUser->hasAllPermissions(['edit-news', 'edit-articles']));
         $this->testUser->givePermissionTo('edit-news');
-        $this->testUser->revokePermissionTo($this->testUserPermission);
+        $this->testUser->removePermissionTo($this->testUserPermission);
         $this->assertFalse($this->testUser->hasAllPermissions(['edit-articles', 'edit-news']));
     }
 
@@ -240,7 +240,7 @@ class PermissionTest extends TestCase
     public function it_can_determine_that_the_user_has_all_of_the_permissions_via_role()
     {
         $this->testUserRole->givePermissionTo('edit-articles', 'edit-news');
-        $this->testUser->assignRole('testRole');
+        $this->testUser->attachRole('testRole');
         $this->assertTrue($this->testUser->hasAllPermissions('edit-articles', 'edit-news'));
     }
 
@@ -269,9 +269,9 @@ class PermissionTest extends TestCase
            collect(['edit-articles']),
            $this->testUser->getDirectPermissions()->pluck('slug')
        );
-        $this->testUser->revokePermissionTo('edit-articles');
+        $this->testUser->removePermissionTo('edit-articles');
         $this->assertFalse($this->testUser->hasDirectPermission('edit-articles'));
-        $this->testUser->assignRole('testRole');
+        $this->testUser->attachRole('testRole');
         $this->testUserRole->givePermissionTo('edit-articles');
         $this->assertFalse($this->testUser->hasDirectPermission('edit-articles'));
     }
@@ -281,7 +281,7 @@ class PermissionTest extends TestCase
     {
         $this->testUserRole2->givePermissionTo('edit-news');
         $this->testUserRole->givePermissionTo('edit-articles');
-        $this->testUser->assignRole('testRole|testRole2');
+        $this->testUser->attachRole('testRole|testRole2');
         $this->assertEquals(
            collect(['edit-articles', 'edit-news']),
            $this->testUser->getPermissionsViaRoles()->pluck('slug')
@@ -293,7 +293,7 @@ class PermissionTest extends TestCase
     {
         $this->testUser->givePermissionTo('edit-news');
         $this->testUserRole->givePermissionTo('edit-articles');
-        $this->testUser->assignRole('testRole');
+        $this->testUser->attachRole('testRole');
         $this->assertEquals(
             collect(['edit-articles', 'edit-news']),
             $this->testUser->getAllPermissions()->pluck('slug')

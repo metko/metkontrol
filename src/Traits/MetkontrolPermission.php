@@ -152,13 +152,13 @@ trait MetkontrolPermission
     }
 
     /**
-     * Revoke the given permission.
+     * Remove the given permission.
      *
      * @param \Metko\Metkontrol\Permission[]|string|string[] $permission
      *
      * @return $this
      */
-    public function revokePermissionTo($permissions = null)
+    public function removePermissionTo($permissions = null)
     {
         if (!is_null($permissions)) {
             $permissions = $this->getStoredPermissions($permissions, 'id');

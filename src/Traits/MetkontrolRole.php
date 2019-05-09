@@ -27,11 +27,11 @@ trait MetkontrolRole
     }
 
     /**
-     * Assign a given role or multiple role to the model.
+     * Attach a given role or multiple role to the model.
      *
      * @param array|string|\Metko\Metkontrol\Role ...$roles
      */
-    public function assignRole($role)
+    public function attachRole($role)
     {
         $this->roles()->syncWithoutDetaching($this->mapRoles($role));
         $this->load('roles');

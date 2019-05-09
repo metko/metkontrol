@@ -41,7 +41,7 @@ class MiddlewareTest extends TestCase
     public function a_user_cant_access_a_route_protected_by_role_middleware_if_he_dont_have_one_of_the_roles()
     {
         Auth::login($this->testUser);
-        $this->testUser->assignRole('testRole');
+        $this->testUser->attachRole('testRole');
         $this->assertEquals(
            $this->runMiddleware(
                $this->roleMiddleware, 'testRole1|testRole2'
@@ -52,7 +52,7 @@ class MiddlewareTest extends TestCase
     public function a_user_can_access_a_route_protected_by_role_middleware_if_have_this_role()
     {
         Auth::login($this->testUser);
-        $this->testUser->assignRole('testRole2');
+        $this->testUser->attachRole('testRole2');
         $this->assertEquals(
            $this->runMiddleware(
                $this->roleMiddleware, 'testRole|testRole2'
@@ -140,7 +140,7 @@ class MiddlewareTest extends TestCase
     public function a_user_can_access_a_route_protected_by_permission_or_role_middleware_if_has_this_permission_or_role()
     {
         Auth::login($this->testUser);
-        $this->testUser->assignRole('testRole');
+        $this->testUser->attachRole('testRole');
         $this->testUser->givePermissionTo('edit-articles');
 
         $this->assertEquals(
@@ -152,8 +152,8 @@ class MiddlewareTest extends TestCase
             $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'),
             200
         );
-        $this->testUser->revokePermissionTo('edit-articles');
-        $this->testUser->assignRole('testRole');
+        $this->testUser->removePermissionTo('edit-articles');
+        $this->testUser->attachRole('testRole');
         $this->assertEquals(
             $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'),
             200

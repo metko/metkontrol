@@ -1,14 +1,3 @@
-
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/metko/metkontrol.svg?style=flat-square)](https://packagist.org/packages/metko/metkontrol)
-
-[![Build Status](https://img.shields.io/travis/metko/metkontrol/master.svg?style=flat-square)](https://travis-ci.org/metko/metkontrol)
-
-[![Quality Score](https://img.shields.io/scrutinizer/g/metko/metkontrol.svg?style=flat-square)](https://scrutinizer-ci.com/g/metko/metkontrol)
-
-[![Total Downloads](https://img.shields.io/packagist/dt/metko/metkontrol.svg?style=flat-square)](https://packagist.org/packages/metko/metkontrol)
-
-  
-
 Simple personal package to handle roles & permissions inside a Laravel app. Compatible with Laravel 5.8.
   
   
@@ -207,21 +196,21 @@ $model->givePermissionTo($permission);
 
   
 
-### Revoke permissions
+### Remove permissions
 
   
 
 ``` php
 
-$model->revokePermission('permission name')  // Name or slug
+$model->removePermissionTo('permission name')  // Name or slug
 
 // or
 
-$model->revokePermission('permission1 name|permission2 slug');
+$model->removePermissionTo('permission1 name|permission2 slug');
 
-$model->revokePermission([$permission1,  $permission2]);
+$model->removePermissionTo([$permission1,  $permission2]);
 
-$model->revokePermission(); // Will remove all the permission
+$model->removePermissionTo(); // Will remove all the permission
 
 
 ```
