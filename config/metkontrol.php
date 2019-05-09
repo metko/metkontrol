@@ -70,7 +70,10 @@ return [
         //**
         // Permission name desired for the seed command
         //*/
-        'permissions' => ['Edit articles', 'Create articles', 'Delete articles'],
+        'permissions' => [
+            'Create users', 'Update users', 'Delete users',
+            'Create articles', 'Update articles', 'Delete articles',
+        ],
     ],
 
     'cache' => [

@@ -35,7 +35,7 @@ class CreateMetkontrolTables extends Migration
         Schema::create($tableNames['rollables'] ?? 'rollables', function (Blueprint $table) use ($tableNames, $fieldsNames) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('role_id')->index();
-            $table->morphs($fieldsNames['rollable'] ?? 'rollable');
+            $table->morphs($fieldsNames['rollable'] ?? 'rollable', 'rollable');
             $table->timestamps();
 
             $table->foreign('role_id')
@@ -47,7 +47,7 @@ class CreateMetkontrolTables extends Migration
         Schema::create($tableNames['permissionables'] ?? 'permissionables', function (Blueprint $table) use ($tableNames, $fieldsNames) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('permission_id')->index();
-            $table->morphs($fieldsNames['permissionable'] ?? 'permissionable');
+            $table->morphs($fieldsNames['permissionable'] ?? 'permissionable', 'permissionable');
             $table->timestamps();
 
             $table->foreign('permission_id')
