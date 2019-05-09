@@ -23,7 +23,7 @@ class MetkontrolServiceProvider extends ServiceProvider
             ], 'seeds');
 
         $this->publishes([
-                dirname(__DIR__).'/migrations/create_metkontrol_tables.php' => $this->getMigrationFileName($filesystem),
+                dirname(__DIR__).'/migrations/0000_00_00_000000_create_metkontrol_tables.php' => $this->getMigrationFileName($filesystem),
             ], 'migrations');
 
         $this->registerInjection();
